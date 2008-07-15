@@ -1,0 +1,66 @@
+#!/bin/bash 
+
+#might not use this var
+#[ "$RSGE_R" ] || RSGE_R=R
+RSGE_R=R
+#check arguments
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <data file> [R path]"
+    exit 1
+fi
+#not going to check this
+#if [ -z "$LSB_JOBID" ]; then
+#    echo "Not running under SGE ... aborting."
+#    exit 1
+#fi
+if [ "$SGE_TASK_ID" != "undefined" ]; then
+  sgeenvfile=$1-$SGE_TASK_ID; shift
+else
+  sgeenvfile=$1; shift
+fi
+
+sgereturnfile=${sgeenvfile}.sge.ret
+#I am not exactly sure what this is going
+[ "$1" ] && RSGE_R="$1"
+#I am not going to support MPI, I dont understand what the MPI use case is.
+#numhosts=0
+#for i in $LSB_HOSTS; do
+#    numhosts=`expr $numhosts + 1`
+#done
+#
+#if [ $numhosts -gt 1 ]; then
+#    bhostfile="Rsge_bhosts.$LSB_JOBID"
+#    rm -f $bhostfile
+#    for i in $LSB_HOSTS; do
+#	echo $i >> $bhostfile
+#    done
+#    lamboot -v $bhostfile
+#fi
+
+"$RSGE_R" --vanilla <<EOF
+
+sge.ret <- try({
+  newenv <- environment()
+  load("${sgeenvfile}", envir=newenv)
+  for(package.name in rev(packages))
+    {
+	cat("loading package", package.name, "\n")
+	library(package.name, character.only=TRUE)
+    }
+
+  eval(get("sge.call", env=newenv), envir=newenv)
+})
+#print(sge.ret)
+save(sge.ret, file = "${sgereturnfile}")
+
+EOF
+
+rc=$?
+#not supporting MPI
+#if [ $numhosts -gt 1 ]; then
+#    lamhalt -v
+#    rm -f $bhostfile
+#fi
+
+exit $rc
+

@@ -1,0 +1,15 @@
+# how many rows per job by default
+options(sge.use.cluster="TRUE")
+options(sge.block.size=100)
+options(sge.file.prefix="Rsge_data")
+options(sge.qsub="qsub")
+options(sge.qstat="qstat")
+options(sge.qacct="qacct")
+options(sge.qsub.options="-cwd")
+options(sge.user.options="-S /bin/bash")
+options(sge.qsub.blocking="-sync y -t 1-")
+options(sge.ret.ext="sge.ret")
+options(sge.script="RunSgeJob")
+options(sge.monitor.script="MonitorJob.sh")
+#can we use qacct to check completed job status?
+options(sge.use.qacct="FALSE")

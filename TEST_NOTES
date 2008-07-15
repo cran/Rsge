@@ -1,0 +1,3 @@
+There are some things that will be easier to test by hand.
+
+Test that -now option works, if it is set, the the program should fail if it cannot run now.
