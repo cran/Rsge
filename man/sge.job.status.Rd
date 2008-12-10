@@ -1,17 +1,15 @@
 \name{sge.job.status}
 \alias{sge.job.status}
-\title{Forwards return calls that express a jobs state}
+\title{Determines the state of jobs}
 \description{
 Used to determine if a job is running. 
 }
 \usage{
-sge.job.status(jobid, qacct=getOption("sge.use.qacct"), qstat=getOption("sge.qstat"), debug=FALSE)
+sge.job.status(jobid, qacct=getOption("sge.use.qacct"))
 }
 \arguments{
 \item{jobid}{ID of the job to be checked}
 \item{qacct}{Specifies if qacct should be used to determine the status of completed jobs}
-\item{qstat}{path to qstat, default is qstat}
-\item{debug}{Prints out a message related to the status of the job}
 }
 \details{
 This method checks the qstat command to see if the specified job is still running. 

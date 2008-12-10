@@ -10,6 +10,9 @@ sapply(names(l1), func1, l1 )
 sge.parSapply(names(l1), func1, l1)
 
 sge.parSapply(names(l1), func1, l1, cluster=FALSE)
-sge.parSapply(names(l1), func1, l1, trace=FALSE)
-sge.parSapply(names(l1), func1, l1, debug=TRUE)
+sge.options(sge.trace="FALSE")
+sge.parSapply(names(l1), func1, l1)
+sge.options(sge.debug="TRUE")
+sge.options(sge.trace="TRUE")
+sge.parSapply(names(l1), func1, l1)
 

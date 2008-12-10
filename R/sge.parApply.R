@@ -6,23 +6,28 @@ sge.apply <- function(X, MARGIN, FUN, ...,
                           njobs,
                           batch.size=getOption('sge.block.size'),
                           packages=NULL,
-                          savelist=NULL,
+                          global.savelist=NULL,
+                          function.savelist=NULL,
                           cluster=getOption('sge.use.cluster'),
-                          trace=TRUE,
-                          debug=FALSE,
+                          trace=getOption('sge.trace'),
+                          debug=getOption('sge.debug'),
                           file.prefix=getOption('sge.file.prefix')
                          ) {
     if(MARGIN == 1) {
       sge.parRapply(X, FUN, ...,
                    join.method=join.method,cluster=cluster,
                    njobs=njobs, batch.size=batch.size,
-                   packages=packages, savelist=savelist,
+                   packages=packages, 
+                   global.savelist=global.savelist, 
+                   function.savelist=function.savelist,
                    trace=trace, debug=debug, file.prefix=file.prefix)
     } else {
       sge.parCapply(X, FUN, ...,
                    join.method=join.method,cluster=cluster,
                    njobs=njobs, batch.size=batch.size,
-                   packages=packages, savelist=savelist,
+                   packages=packages, 
+                   global.savelist=global.savelist, 
+                   function.savelist=function.savelist,
                    trace=trace, debug=debug, file.prefix=file.prefix)
     } 
 } 
@@ -32,17 +37,20 @@ sge.parCapply <- function(X, FUN, ...,
                           njobs,
                           batch.size=getOption('sge.block.size'),
                           packages=NULL,
-                          savelist=NULL,
+                          global.savelist=NULL,
+                          function.savelist=NULL,
                           cluster=getOption('sge.use.cluster'),
-                          trace=TRUE,
-                          debug=FALSE,
+                          trace=getOption('sge.trace'),
+                          debug=getOption('sge.debug'),
                           file.prefix=getOption('sge.file.prefix')
                          ) {
   if(cluster) {
     sge.parParApply(t(X), FUN, ..., 
                join.method=join.method,  
                njobs=njobs, batch.size=batch.size,
-               packages=packages, savelist=savelist,
+               packages=packages, 
+               global.savelist=global.savelist, 
+               function.savelist=function.savelist,
                trace=trace, debug=debug, file.prefix=file.prefix, apply.method=2
                )
   } else {
@@ -54,20 +62,23 @@ sge.parCapply <- function(X, FUN, ...,
 
 sge.parRapply <- function(X, FUN, ...,
                           join.method=cbind,
-                          njobs,
+                          njobs, 
                           batch.size=getOption('sge.block.size'),
                           packages=NULL,
-                          savelist=NULL,
+                          global.savelist=NULL,
+                          function.savelist=NULL,
                           cluster=getOption('sge.use.cluster'),
-                          trace=TRUE,
-                          debug=FALSE,
+                          trace=getOption('sge.trace'),
+                          debug=getOption('sge.debug'),
                           file.prefix=getOption('sge.file.prefix')
                          ) {
   if(cluster) {
     sge.parParApply(X, FUN, ...,  
                 join.method=join.method, 
                 njobs=njobs, batch.size=batch.size,
-                packages=packages, savelist=savelist,
+                packages=packages, 
+                global.savelist=global.savelist, 
+                function.savelist=function.savelist,
                 trace=trace, debug=debug, file.prefix=file.prefix, apply.method=2
                 )
   } else {
@@ -81,16 +92,20 @@ sge.parLapply <- function(X, FUN, ...,
                           njobs,
                           batch.size=getOption('sge.block.size'),
                           packages=NULL,
-                          savelist=NULL,
+                          global.savelist=NULL,
+                          function.savelist=NULL,
                           cluster=getOption('sge.use.cluster'),
-                          trace=TRUE,
-                          debug=FALSE,
+                          trace=getOption('sge.trace'),
+                          debug=getOption('sge.debug'),
                           file.prefix=getOption('sge.file.prefix')
                           ) {
   if(cluster) {
     sge.parParApply(X, FUN, ...,
-                join.method=join.method, njobs=njobs, batch.size=batch.size,
-                packages=packages, savelist=savelist,
+                join.method=join.method, njobs=njobs, 
+                batch.size=batch.size,
+                packages=packages, 
+                global.savelist=global.savelist,
+                function.savelist=function.savelist,
                 trace=trace, debug=debug, file.prefix=file.prefix, apply.method=1
                 )
   } else {
@@ -107,10 +122,11 @@ sge.parSapply <- function(X, FUN, ...,
                           njobs,
                           batch.size=getOption('sge.block.size'),
                           packages=NULL,
-                          savelist=NULL,
+                          global.savelist=NULL,
+                          function.savelist=NULL,
                           cluster=getOption('sge.use.cluster'),
-                          trace=TRUE,
-                          debug=FALSE,
+                          trace=getOption('sge.trace'),
+                          debug=getOption('sge.debug'),
                           file.prefix=getOption('sge.file.prefix')
                          )
 {
@@ -120,7 +136,9 @@ sge.parSapply <- function(X, FUN, ...,
     answer <- sge.parParApply(X, FUN, ...,
                join.method=join.method, njobs=njobs, 
                batch.size=batch.size,
-               packages=packages, savelist=savelist,
+               packages=packages, 
+               global.savelist=global.savelist, 
+               function.savelist=function.savelist,
                trace=trace, debug=debug, 
                file.prefix=file.prefix, apply.method=1
               )
@@ -148,15 +166,17 @@ sge.parParApply <- function (X, FUN, ...,
                            join.method=cbind,
                            njobs,
                            batch.size=getOption('sge.block.size'),
-                           trace=TRUE,
+                           trace=getOption('sge.trace'),
                            packages=NULL,
-                           savelist=NULL,
-                           debug=FALSE,
+                           global.savelist=NULL,
+                           function.savelist=NULL,
+                           debug=getOption('sge.debug'),
                            file.prefix=getOption('sge.file.prefix'),
                            apply.method=2
 
                          )
   {
+    # split X
     if(missing(njobs) && (is.matrix(X) || is.data.frame(X)))
       njobs <- max(1,ceiling(nrow(X)/batch.size))    
     else if(missing(njobs) && (is.vector(X) || is.list(X)))
@@ -170,23 +190,30 @@ sge.parParApply <- function (X, FUN, ...,
     if(debug) print(rowSet)    
     prefix <- tempfile(pattern = file.prefix, tmpdir = getwd())
     filenames <- vector(length=length(rowSet))
-    for (i in 1:length(rowSet)) {
+   # save the GLOBAL data
+   if(apply.method == 1) {
+        sge.globalPrep(
+                          lapply, X=NULL, FUN=FUN, ...,
+                          global.savelist=global.savelist,
+                          function.savelist=function.savelist,
+                          sge.packages=packages,
+                          debug=debug,prefix=prefix
+                         )
+   } else if(apply.method ==2) {
+        sge.globalPrep(
+                          apply, X=NULL, MARGIN=1, FUN=FUN, ...,
+                          global.savelist=global.savelist,
+                          function.savelist=function.savelist,
+                          sge.packages=packages,
+                          debug=debug,prefix=prefix
+                         )
+   }
+   #save X into the task specific file
+   for (i in 1:length(rowSet)) {
       if(apply.method == 1) {
-        filenames[i] <- sge.parPrep(
-               lapply, X=rowSet[[i]], FUN=FUN, ..., 
-    	       savelist=savelist, 
-               packages=packages, 
-               index=i,
-               prefix=prefix
-              )
+        filenames[i] <- sge.taskPrep(X=rowSet[[i]],index=i,prefix=prefix)
       } else if(apply.method ==2) {
-        filenames[i] <- sge.parPrep(
-               apply, X=rowSet[[i]], MARGIN=1, FUN=FUN, ...,
-               savelist=savelist,
-               packages=packages,
-               index=i,
-               prefix=prefix
-              )
+        filenames[i] <- sge.taskPrep(X=rowSet[[i]],index=i,prefix=prefix)
       }
     } 
     if(trace) cat("Completed storing environment to disk\n")
@@ -212,8 +239,20 @@ sge.parParApply <- function (X, FUN, ...,
     jobid <- sge.get.jobid(result)
     # I am not sure how well R can handle this, maybe it will not scale
     system(paste("for i in `ls *.e",jobid,"*`; do cat $i; done", sep=""))
-    results <- lapply( filenames, sge.get.result, jobid = jobid, remove = !debug)
+    if(as.logical(getOption("sge.remove.files"))) {
+      system(paste("rm *.e",jobid,"*; rm *.o", jobid, "*;" , sep=""))
+    }
+    results <- lapply( filenames, sge.get.result, jobid = jobid)
+    if(as.logical(getOption("sge.remove.files"))) file.remove(paste(prefix, "-GLOBAL",   sep=""))
     if(debug) print (results)
-    retval <- docall(join.method, results)
-    retval
+    # When c is run the try-errors are converted into strings
+    # so its probably better to not combine errors, I
+    # still need to seperately test this for cbind and consider other operations
+    if(any(lapply(results , function(e1) class(e1) == "try-error") == TRUE)) {
+      print("Not running join method since there are errors")
+      results
+    } else {
+      retval <- docall(join.method, results)
+      retval
+    }
   }

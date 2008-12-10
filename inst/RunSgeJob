@@ -13,6 +13,8 @@ fi
 #    echo "Not running under SGE ... aborting."
 #    exit 1
 #fi
+sgeglobalenvfile=$1-GLOBAL
+sgefunctionenvfile=$1-FUNCTION
 if [ "$SGE_TASK_ID" != "undefined" ]; then
   sgeenvfile=$1-$SGE_TASK_ID; shift
 else
@@ -40,16 +42,47 @@ sgereturnfile=${sgeenvfile}.sge.ret
 "$RSGE_R" --vanilla <<EOF
 
 sge.ret <- try({
-  newenv <- environment()
-  load("${sgeenvfile}", envir=newenv)
-  for(package.name in rev(packages))
+#parApply branch  
+  PAR <- FALSE
+  if(file.exists("${sgeglobalenvfile}")) {
+    load("${sgeglobalenvfile}")
+  } 
+  if(file.exists("${sgeenvfile}")) {
+    #if this file exists, then we are running in parallel
+    PAR <- TRUE
+    load("${sgeenvfile}")
+  }
+  for(package.name in rev(sge.packages))
     {
 	cat("loading package", package.name, "\n")
 	library(package.name, character.only=TRUE)
+8   }
+  mycall <- get("sge.call")
+  #we are running paralell version
+  if(file.exists("${sgeglobalenvfile}")) {
+    if(file.exists("${sgefunctionenvfile}")) {
+      cat("loading function name")
+      f.env <- new.env(parent=globalenv()) 
+      load("${sgefunctionenvfile}", envir=f.env)
+      if(PAR) {
+        environment(mycall\$FUN) <- f.env
+      } else {
+        environment(mycall[[1]]) <- f.env
+      }
     }
 
-  eval(get("sge.call", env=newenv), envir=newenv)
+    if(! is.null(mycall\$X) ) { 
+      warning("overwriting an existing X in the call with task copy")
+    }
+    #set the apply value for X to be X
+    if(PAR) {
+      mycall\$X <- X
+    }
+  }
+#  print(ls())
+  eval(mycall)
 })
+#print(as.list(mycall))
 #print(sge.ret)
 save(sge.ret, file = "${sgereturnfile}")
 

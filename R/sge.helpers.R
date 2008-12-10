@@ -25,10 +25,8 @@ sge.split <- function (x, ncl) {
   }
 }
 
-sge.job.status <- function (jobid, 
-                            qacct=getOption("sge.use.qacct"), qstat=getOption("sge.qstat"), 
-                            debug = FALSE) {
-  system(paste(file.path(.path.package("Rsge"), getOption("sge.monitor.script")), jobid, qacct, debug, qstat), intern=FALSE)
+sge.job.status <- function (jobid, qacct=getOption("sge.use.qacct")) {
+  system(paste(file.path(.path.package("Rsge"), getOption("sge.monitor.script")), jobid, qacct, getOption("sge.debug"), getOption("sge.qstat")), intern=FALSE)
 }
 
 sge.checkNotNow <- function(result) {
@@ -52,3 +50,16 @@ sge.checkNotNow <- function(result) {
 #  system(paste("rm -f ", prefix,"*", sep="" ))
 #  system(paste("rm -f ", script,".*", sep="" ))
 #}
+
+# this function is mainly for testing, it doesnt logically serve a purpose
+# because it is rarely a good job to blobk for a single submission
+# it will always be slower, the only use case is it the submission machine is loaded.
+sge.run <- function(...) {
+  info <- sge.submit(...)
+  status <- sge.job.status(info$jobid)
+  while(status != 0) {
+    Sys.sleep(4)
+    status <- sge.job.status(info$jobid)
+  }
+  sge.list.get.result(info)
+}

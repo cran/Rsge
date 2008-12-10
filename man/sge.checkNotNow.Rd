@@ -1,7 +1,7 @@
 \name{sge.checkNotNow}
 \alias{sge.checkNotNow}
 \title{Determines if the -now y flag was run and if the job can be scheduled}
-\description{Determines if the job can be scheduled immediately}
+\description{Internal function. Determines if the job can be scheduled immediately}
 \usage{
 sge.checkNotNow(result)
 }
