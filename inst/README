@@ -17,16 +17,12 @@ The program functions as follows:
 
 This new version has the following changes
 
-0.5 CHANGES
+0.6.x
 ----------
+(mostly insignificant)
 
-1. for parApply functions, stores X in a task specific file, everything else (funtion, arguments, savelist, package names) are stored in a file that end with GLOBAL.
-2. sge.options are now documented
-3. added the following sge options:
-    -sge.remove.files - should all of the data files be removed after execution?
-    -sge.debug - global config for debug settings. 
-    -sge.trace - global config for info settings (this should be named info and not trace)
-4. There are some additional features to give the user more flexibility with how environments are handled, these may be removed in a later version.
+1. a fix so that the global options will load on R>2.8#
+2. updated DESCRIPTION file
 
 0.6 changes
 -----------
@@ -43,12 +39,27 @@ Internal changes.
 6. Internal creates -FUNCITON and -GLOBAL files to pass the seperate environments.
 7. sge.submit now uses the same call sge.globalPrep to prepare its data files.
 
+
+0.5 CHANGES
+----------
+
+1. for parApply functions, stores X in a task specific file, everything else (funtion, arguments, savelist, package names) are stored in a file that end with GLOBAL.
+2. sge.options are now documented
+3. added the following sge options:
+    -sge.remove.files - should all of the data files be removed after execution?
+    -sge.debug - global config for debug settings. 
+    -sge.trace - global config for info settings (this should be named info and not trace)
+4. There are some additional features to give the user more flexibility with how environments are handled, these may be removed in a later version.
+
+
 Expected changes in 0.7
 
 1. Create central logging components, support following level:
   -NONE, WARNING, INFO, FINE, DEBUG
 2. remove the following arguements: trace, debug, remove.files - these will be set by the global config options
 3. Consider having the code parse the function expression to determine which variables need to be saved. This would get rid of the global.savelist and function.savelist arguments.
+4. Consider implementing asyncronous parApply, I am not even sure what this looks like yet:)
+5. Remove snow dependency, it is a pain to require to dependency on the package for one function.
 
 LICENSE
 ------

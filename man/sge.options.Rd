@@ -1,6 +1,7 @@
 \name{sge.options}
 \alias{sge.options}
 \alias{sge.getOption}
+\alias{sge.setDefaultOptions}
 \title{Allows a user to examine and reset values of global parameters}
 \description{
   Allows a user to examine and reset values of global parameters
@@ -8,12 +9,15 @@
 \usage{
 sge.options(...)
 sge.getOption(...)
+sge.setDefaultOptions()
 }
 \arguments{
   \item{...}{Either empty, or a succession of parameter names in quotes, or a succession of name=value pairs. See below for the parameter names.}
 }
 \details{
  This function allows the user to examine and reset the values of global parameters. It is analogous to the system function options. 
+
+set.setDefaultOptions is used to set all of the default options for sge, it is mainly used by the loader to init options.
 
  The global parameters are:
 
