@@ -23,7 +23,7 @@ options(sge.remove.files=TRUE)
 options(sge.debug=FALSE)
 options(sge.trace=TRUE)
 # should we save the global environment by default.
-options(sge.save.global=TRUE)
+options(sge.save.global=FALSE)
 # global variables that should not be changed, or should be changed very carefully. 
 options(sge.qsub.options="-cwd")
 options(sge.qsub.blocking="-sync y -t 1-")
